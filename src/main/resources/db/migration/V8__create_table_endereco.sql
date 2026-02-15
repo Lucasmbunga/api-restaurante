@@ -1,0 +1,9 @@
+CREATE TABLE endereco(
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  cidade VARCHAR(50),
+  bairro VARCHAR(50) NOT NULL,
+  zona INT,
+  rua VARCHAR(50),
+  id_cliente BIGINT NOT NULL,
+  FOREIGN KEY(id_cliente) REFERENCES cliente(id)
+);

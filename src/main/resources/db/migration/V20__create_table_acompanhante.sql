@@ -1,0 +1,6 @@
+CREATE TABLE acompanhante(
+   id BIGINT PRIMARY KEY AUTO_INCREMENT,
+   nome VARCHAR(50) NOT NULL UNIQUE,
+   preco DECIMAL,
+   descricao VARCHAR(255)
+);
