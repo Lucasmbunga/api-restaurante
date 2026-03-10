@@ -53,4 +53,8 @@ public class Pedido {
 
     @OneToMany(mappedBy = "pedido",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ItemPedido> itens;
+
+    public void addItem(ItemPedido item){
+        this.itens.add(item);
+    }
 }

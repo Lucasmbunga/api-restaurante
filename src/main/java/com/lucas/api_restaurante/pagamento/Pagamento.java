@@ -23,7 +23,7 @@ public class Pagamento {
     private Long id;
 
     @NotNull
-    private BigDecimal valorPago;
+    private BigDecimal valorPago=new BigDecimal(10);
     @NotNull
     private LocalDateTime dataPagamento;
     @Enumerated(EnumType.STRING)

@@ -1,5 +1,6 @@
 package com.lucas.api_restaurante.saidacaixa;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lucas.api_restaurante.caixa.Caixa;
 import com.lucas.api_restaurante.contasapagar.ContasAPagar;
 import com.lucas.api_restaurante.turno.Turno;
@@ -35,10 +36,11 @@ public class SaidaCaixa {
     @JoinColumn(name = "id_turno")
     private Turno turno;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,optional = true)
     @JoinColumn(name = "id_conta_a_pagar")
     private ContasAPagar contasAPagar;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_caixa")
     private Caixa caixa;

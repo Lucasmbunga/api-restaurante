@@ -1,5 +1,6 @@
 package com.lucas.api_restaurante.itempedido;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lucas.api_restaurante.acompanhante.Acompanhante;
 import com.lucas.api_restaurante.pedido.Pedido;
 import com.lucas.api_restaurante.produto.Produto;
@@ -22,9 +23,8 @@ public class ItemPedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
     private Integer quantidade;
-    @NotNull
+    @Column(nullable = false)
     private BigDecimal precoUnitario;
     private BigDecimal precoTotal;
     private String observacao;
@@ -33,7 +33,8 @@ public class ItemPedido {
     @JoinColumn(name = "id_produto", nullable = false)
     private Produto produto;
 
-    @ManyToOne
+    @JsonProperty(access =  JsonProperty.Access.WRITE_ONLY)
+    @ManyToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name = "id_pedido", nullable = false)
     private Pedido pedido;
 
@@ -44,4 +45,14 @@ public class ItemPedido {
             inverseJoinColumns = @JoinColumn(name = "id_acompanhante")
     )
     private List<Acompanhante> companhantes;
+
+    public ItemPedido(int quantidade, BigDecimal precoUnitario, BigDecimal precoTotal, String observacao,Produto produto,Pedido pedido) {
+        this.quantidade = quantidade;
+        this.precoUnitario = precoUnitario;
+        this.precoTotal = precoTotal;
+        this.observacao = observacao;
+        this.produto = produto;
+        this.pedido = pedido;
+
+    }
 }

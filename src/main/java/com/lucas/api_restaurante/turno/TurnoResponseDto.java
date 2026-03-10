@@ -1,6 +1,7 @@
 package com.lucas.api_restaurante.turno;
 
 import com.lucas.api_restaurante.caixa.Caixa;
+import com.lucas.api_restaurante.caixa.CaixaAberturaResponseDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,6 +15,6 @@ public record TurnoResponseDto(
         @NotNull LocalTime horaAbertura,
         @NotNull StatusTurno status,
         @NotBlank String responsavel,
-        @NotNull Caixa caixa
+        @NotNull CaixaAberturaResponseDto caixa
         ) {
 }

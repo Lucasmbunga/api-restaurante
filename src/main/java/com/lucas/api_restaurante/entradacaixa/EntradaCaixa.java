@@ -37,6 +37,7 @@ public class EntradaCaixa {
     @JoinColumn(name = "id_turno")
     private Turno turno;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_caixa")
     private Caixa caixa;

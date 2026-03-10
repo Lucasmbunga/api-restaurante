@@ -28,4 +28,14 @@ public class Mesa {
             inverseJoinColumns = @JoinColumn(name = "id_pedido")
     )
     private List<PedidoSalao> pedidos;
+
+    public void adicionarPedido(PedidoSalao pedidoSalao) {
+        this.pedidos.add(pedidoSalao);
+    }
+    public void esvaziar(PedidoSalao pedidoSalao) {
+        this.pedidos.clear();
+    }
+    public void excluirPedido(PedidoSalao pedidoSalao) {
+        this.pedidos.remove(pedidoSalao);
+    }
 }

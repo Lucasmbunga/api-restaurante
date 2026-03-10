@@ -41,6 +41,7 @@ public class Usuario implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private TipoUsuario tipoUsuario;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Telefone> telefones;
 
