@@ -1,4 +1,4 @@
-package com.lucas.api_restaurante.config;
+package com.lucas.api_restaurante.config.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

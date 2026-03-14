@@ -34,7 +34,7 @@ public class SaidaCaixaController {
         return ResponseEntity.ok(saidaCaixaService.obterSaidasPorTurno(idTurno,"/turnos/"+idTurno+"/saidas-caixa"));
     }
     @PostMapping
-    public ResponseEntity<ApiResponse<SaidaCaixa>> registrarSaida(@RequestBody SaidaCixaRequestDto requestDto) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<SaidaCaixa>> registrarSaida(@RequestBody SaidaCaixaRequestDto requestDto) throws RecursoNaoEncontradoException {
         return ResponseEntity.status(HttpStatus.CREATED).body(saidaCaixaService.darSaidaCaixa(requestDto));
     }
 }

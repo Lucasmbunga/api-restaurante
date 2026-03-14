@@ -1,4 +1,4 @@
-CREATE TABLE item_cardapio(
+CREATE TABLE IF NOT EXISTS item_cardapio(
     id_produto BIGINT NOT NULL,
     id_cardapio BIGINT NOT NULL,
     PRIMARY KEY(id_produto,id_cardapio),

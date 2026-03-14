@@ -1,4 +1,4 @@
-package com.lucas.api_restaurante.config;
+package com.lucas.api_restaurante.config.security;
 
 import jakarta.validation.constraints.NotBlank;
 

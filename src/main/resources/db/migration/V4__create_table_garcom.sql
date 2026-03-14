@@ -1,6 +1,7 @@
 
-CREATE TABLE garcom(
+CREATE TABLE IF NOT EXISTS garcom(
     id BIGINT PRIMARY KEY,
+    cargo ENUM('RESPONSAVEL','ATENDENTE') NOT NULL,
     CONSTRAINT fk_garcom_usuario
     FOREIGN KEY(id)
     REFERENCES usuario(id)

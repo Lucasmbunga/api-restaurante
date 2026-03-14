@@ -1,4 +1,4 @@
-package com.lucas.api_restaurante.config;
+package com.lucas.api_restaurante.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,16 +31,15 @@ public class SecurityConfiguration {
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize->authorize
                         .requestMatchers(HttpMethod.POST,"/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/garcons").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/api/produtos").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE,"/api/produtos/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,"/api/produtos/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/api/categorias").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,"/api/categorias/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE,"/api/produtos/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,"/api/garcons/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE,"/api/garcons/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET,"/usuarios").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/garcons").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/produtos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/produtos/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/produtos/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/categorias").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/categorias/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/produtos/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/garcons/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/garcons/{id}").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .logout(logout->logout.addLogoutHandler(clearSiteData))

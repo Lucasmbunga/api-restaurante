@@ -1,4 +1,4 @@
-package com.lucas.api_restaurante.config;
+package com.lucas.api_restaurante.config.security;
 
 import com.lucas.api_restaurante.usuario.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;

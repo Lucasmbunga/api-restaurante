@@ -1,2 +1,0 @@
-ALTER TABLE produto
-CHANGE COLUMN tipo_protudo tipo_produto ENUM('PRATO','BEBIDA','SOBREMESA','ENTRADA');

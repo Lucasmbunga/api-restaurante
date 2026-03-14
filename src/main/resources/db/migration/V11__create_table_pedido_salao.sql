@@ -1,4 +1,4 @@
-CREATE TABLE pedido_salao(
+CREATE TABLE IF NOT EXISTS pedido_salao(
   id BIGINT PRIMARY KEY,
   CONSTRAINT fk_pedido_salao_pedido
   FOREIGN KEY(id) REFERENCES pedido(id)

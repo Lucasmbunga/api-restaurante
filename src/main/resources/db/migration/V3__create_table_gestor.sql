@@ -1,5 +1,5 @@
 
-CREATE TABLE gestor(
+CREATE TABLE IF NOT EXISTS gestor(
   id BIGINT PRIMARY KEY ,
 
   CONSTRAINT fk_gestor_usuario

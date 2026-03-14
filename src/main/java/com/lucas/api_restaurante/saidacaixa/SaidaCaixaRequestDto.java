@@ -5,8 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
-public record SaidaCixaRequestDto(@NotNull @Positive BigDecimal valor, @NotBlank String descricao, Long idContaAPagar) {
+public record SaidaCaixaRequestDto(@NotNull @Positive BigDecimal valor, @NotBlank String descricao, Long idContaAPagar) {
 
 }

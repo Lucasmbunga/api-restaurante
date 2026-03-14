@@ -9,7 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
-public record PedidoDeliveryResponseDto(@NotEmpty List<ItemPedido> itens,
+public record PedidoDeliveryResponseDto(
+                                        @NotNull Long id,
+                                        @NotEmpty List<ItemPedido> itens,
                                         String nomeCliente,
                                         @NotBlank String nomeGarcom,
                                         @NotNull

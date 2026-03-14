@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record PedidoSalaoResponseDto(
+        @NotNull Long id,
         @NotEmpty List<ItemPedido> itens,
         String nomeCliente,
         @NotBlank String nomeGarcom,

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +47,7 @@ public class SaidaCaixaService {
     }
 
     @Transactional
-    public ApiResponse<SaidaCaixa> darSaidaCaixa(SaidaCixaRequestDto saidaCixaRequest) throws RecursoNaoEncontradoException {
+    public ApiResponse<SaidaCaixa> darSaidaCaixa(SaidaCaixaRequestDto saidaCixaRequest) throws RecursoNaoEncontradoException {
         var turnoAtivo = this.obterTurnoAtivo();
         var caixa = caixaRepository.findByTurno(turnoAtivo).orElseThrow(() -> new RecursoNaoEncontradoException("Caixa não encontrada para o turno especificado"));
 

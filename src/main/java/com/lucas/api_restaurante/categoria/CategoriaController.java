@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/categorias")
+@RequestMapping("/categorias")
 public class CategoriaController {
     private final CategoriaService categoriaService;
 
@@ -22,27 +22,27 @@ public class CategoriaController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Categoria>>> listarCategorias(@PageableDefault(page = 0, size = 10) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(categoriaService.listarCategorias(pageable,"/api/categorias"));
+                .body(categoriaService.listarCategorias(pageable,"/categorias"));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Categoria>> buscarCategoriaPorId(@PathVariable Long id) throws RecursoNaoEncontradoException {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(categoriaService.buscarCategoriaPorId(id,"/api/categorias/"+id));
+                .body(categoriaService.buscarCategoriaPorId(id,"/categorias/"+id));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<CategoriaResponseDto>> criarCategoria(@Valid @RequestBody CategoriaRequestDto categoriaRequestDto){
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(categoriaService.cadastrarCategoria(categoriaRequestDto,"/api/categorias"));
+                .body(categoriaService.cadastrarCategoria(categoriaRequestDto,"/categorias"));
     }
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Categoria>> atualizarCategoria(@PathVariable Long id, @Valid @RequestBody CategoriaRequestDto categoriaRequestDto) throws RecursoNaoEncontradoException{
         return ResponseEntity.status(HttpStatus.OK)
-                .body(categoriaService.atualizarCategoria(id,categoriaRequestDto,"/api/categorias/"+id));
+                .body(categoriaService.atualizarCategoria(id,categoriaRequestDto,"/categorias/"+id));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> excluirCategoria(@PathVariable Long id) throws RecursoNaoEncontradoException {
-        return ResponseEntity.status(HttpStatus.OK).body(categoriaService.excluirCategoria(id,"/api/categorias"));
+        return ResponseEntity.status(HttpStatus.OK).body(categoriaService.excluirCategoria(id,"/categorias"));
     }
 }

@@ -1,4 +1,4 @@
-CREATE TABLE cardapio(
+CREATE TABLE IF NOT EXISTS cardapio(
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     nome_versao  VARCHAR(50),
     ativo BOOLEAN

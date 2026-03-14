@@ -1,4 +1,4 @@
-CREATE TABLE entrada_caixa(
+CREATE TABLE IF NOT EXISTS entrada_caixa(
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     data DATETIME NOT NULL,
     descricao VARCHAR(255),

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/clientes")
+@RequestMapping("/clientes")
 public class ClienteController {
     private final ClienteService clienteService;
 
@@ -22,12 +22,12 @@ public class ClienteController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ClienteResponseDto>>> listarClientes(@PageableDefault(page = 0,size = 10,direction = Sort.Direction.ASC,sort = "nome")Pageable pageable){
-        return ResponseEntity.ok(clienteService.listarClientes(pageable,"/api/clientes"));
+        return ResponseEntity.ok(clienteService.listarClientes(pageable,"/clientes"));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ClienteResponseDto>> buscarClientePorId(@PathVariable Long id){
-        return ResponseEntity.ok(clienteService.buscarClientePorId(id,"/api/clientes/"));
+        return ResponseEntity.ok(clienteService.buscarClientePorId(id,"/clientes/"));
     }
 
     @PostMapping
@@ -37,11 +37,11 @@ public class ClienteController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ClienteResponseDto>> editarDadosDoCliente(@RequestBody ClienteRequestDto clienteRequestDto, @PathVariable Long id){
-        return ResponseEntity.ok(clienteService.editarDadosDoCliente(id,clienteRequestDto,"/api/clientes/"));
+        return ResponseEntity.ok(clienteService.editarDadosDoCliente(id,clienteRequestDto,"/clientes/"));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> excluirCliente(@PathVariable Long id){
-        return ResponseEntity.ok(clienteService.excluirCliente(id,"/api/clientes/"));
+        return ResponseEntity.ok(clienteService.excluirCliente(id,"/clientes/"));
     }
 }

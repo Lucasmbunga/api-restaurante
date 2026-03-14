@@ -1,4 +1,4 @@
-CREATE TABLE item_pedido(
+CREATE TABLE IF NOT EXISTS item_pedido(
        id BIGINT PRIMARY KEY AUTO_INCREMENT,
        quantidade INT NOT NULL,
        preco_unitario DECIMAL NOT NULL,

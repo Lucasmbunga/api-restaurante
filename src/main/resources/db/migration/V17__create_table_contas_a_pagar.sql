@@ -1,4 +1,4 @@
-CREATE TABLE contas_a_pagar(
+CREATE TABLE IF NOT EXISTS contas_a_pagar(
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     valor_a_pagar DECIMAL NOT NULL,
     data_vencimento DATE,

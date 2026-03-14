@@ -43,7 +43,7 @@ public class PedidoDeliveryService {
 
     public ApiResponse<PedidoDeliveryResponseDto> buscarPedidoPorId(Long id, String path){
         var pedido=pedidoRepository.findById(id).orElseThrow(()->new RuntimeException("Pedido não encontrado"));
-        return ResponseUtil.sucess(new PedidoDeliveryResponseDto(pedido.getItens(),pedido.getCliente().getNome(),pedido.getGarcom().getNome(),pedido.getValorTotal(),pedido.getDescricao(),pedido.getEstado()),"Sucesso",path);
+        return ResponseUtil.sucess(this.responseDto(pedido),"Sucesso",path);
     }
 
     public ApiResponse<List<PedidoDelivery>> filtrarPedidos(Pageable pageable, EstadoPedido estado, LocalDate data, LocalTime hora, String path) {
@@ -100,6 +100,7 @@ public class PedidoDeliveryService {
 
     private PedidoDeliveryResponseDto responseDto(PedidoDelivery pedido) {
         return new PedidoDeliveryResponseDto(
+                pedido.getId(),
                 pedido.getItens(),
                 pedido.getCliente().getNome(),
                 pedido.getGarcom().getNome(),

@@ -1,3 +1,0 @@
-ALTER TABLE caixa ADD COLUMN valor_inicial DECIMAL NOT NULL;
-ALTER TABLE caixa ADD COLUMN id_turno BIGINT NOT NULL;
-ALTER TABLE caixa ADD CONSTRAINT fk_caixa_turno FOREIGN KEY(id_turno) REFERENCES turno(id);

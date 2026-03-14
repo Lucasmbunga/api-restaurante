@@ -1,4 +1,4 @@
-CREATE TABLE pedido_delivery(
+CREATE TABLE IF NOT EXISTS pedido_delivery(
     id BIGINT PRIMARY KEY,
     id_endereco BIGINT,
     taxa_entrega DECIMAL,

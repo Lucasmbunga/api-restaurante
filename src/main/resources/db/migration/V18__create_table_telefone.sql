@@ -1,4 +1,4 @@
-CREATE TABLE telefone(
+CREATE TABLE IF NOT EXISTS telefone(
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     numero_telefone VARCHAR(30),
     id_usuario BIGINT NOT NULL,

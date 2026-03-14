@@ -1,4 +1,4 @@
-CREATE TABLE item_pedido_acompanhante(
+CREATE TABLE IF NOT EXISTS item_pedido_acompanhante(
    id_acompanhante BIGINT NOT NULL,
    id_item_pedido BIGINT NOT NULL,
    PRIMARY KEY(id_acompanhante,id_item_pedido),

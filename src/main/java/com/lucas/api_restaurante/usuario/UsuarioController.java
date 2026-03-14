@@ -1,17 +1,13 @@
 package com.lucas.api_restaurante.usuario;
 
-import com.lucas.api_restaurante.telefone.Telefone;
+import com.lucas.api_restaurante.responseutils.ApiResponse;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,5 +29,15 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> buscar(@PathVariable Long id){
         return ResponseEntity.ok(usuarioService.buscarUsuarioPorId(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<Usuario>> cadastrar(@Valid @RequestBody UsuarioCreateDto usuario){
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.registrarUsuario(usuario,"/usuarios"));
+
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deletar(@PathVariable Long id){
+        return ResponseEntity.ok(usuarioService.excluirUsuario(id,""));
     }
 }

@@ -1,8 +1,10 @@
 package com.lucas.api_restaurante.mesa;
 
 import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.pedido.EstadoPedido;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
+import org.antlr.v4.runtime.RecognitionException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +51,25 @@ public class MesaService {
         var mesaEditada=mesaRepository.save(mesaExistente);
 
         return ResponseUtil.sucess(mesaEditada,"Mesa atualizada",path+id);
+    }
+
+    public ApiResponse<Void> desocuparMesa(Long id,String path)throws RecursoNaoEncontradoException{
+        var mesa=mesaRepository.findById(id).orElseThrow(()->new RecursoNaoEncontradoException("Mesa não encontrada."));
+        if(!mesa.getEstaOcupada()){
+            throw new RuntimeException("Esta mesa já está livre");
+        }
+
+        var pedidos=mesaRepository.findPedido(mesa.getId()).get();
+        pedidos.forEach(pedido->{
+
+        if(!(pedido.getEstado().equals(EstadoPedido.FECHADO) || pedido.getEstado().equals(EstadoPedido.ENTREGUE))){
+            throw new RuntimeException("Esta mesa não pode ser desocupada porque tem um pedido aberto nela.");
+        }
+        });
+
+        mesa.setEstaOcupada(false);
+        mesaRepository.save(mesa);
+        return ResponseUtil.sucess("Mesa "+mesa.getNumeroMesa()+" desocupada com sucesso",path+mesa.getId());
     }
 
     public ApiResponse<Void> excluirMesa(Long id,String path)throws RecursoNaoEncontradoException{
