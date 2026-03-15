@@ -38,14 +38,6 @@ public class ItemPedido {
     @JoinColumn(name = "id_pedido", nullable = false)
     private Pedido pedido;
 
-    @ManyToMany()
-    @JoinTable(
-            name = "item_pedido_acompanhante",
-            joinColumns = @JoinColumn(name = "id_item_pedido"),
-            inverseJoinColumns = @JoinColumn(name = "id_acompanhante")
-    )
-    private List<Acompanhante> companhantes;
-
     public ItemPedido(int quantidade, BigDecimal precoUnitario, BigDecimal precoTotal, String observacao,Produto produto,Pedido pedido) {
         this.quantidade = quantidade;
         this.precoUnitario = precoUnitario;

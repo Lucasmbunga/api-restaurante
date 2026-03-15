@@ -1,11 +1,18 @@
 package com.lucas.api_restaurante.pedidodelivery;
 
+import com.lucas.api_restaurante.acompanhante.Acompanhante;
+import com.lucas.api_restaurante.acompanhante.AcompanhanteRepository;
 import com.lucas.api_restaurante.cliente.ClienteRepository;
+import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
 import com.lucas.api_restaurante.garcom.GarcomRepository;
-import com.lucas.api_restaurante.itempedido.ItemPedido;
-import com.lucas.api_restaurante.itempedido.ItemPedidoDeleteRequestDto;
-import com.lucas.api_restaurante.itempedido.ItemPedidoRequestDto;
+import com.lucas.api_restaurante.itemacompanhante.ItemAcompanhante;
+import com.lucas.api_restaurante.itemacompanhante.ItemAcompanhanteRepository;
+import com.lucas.api_restaurante.itempedido.*;
 import com.lucas.api_restaurante.pedido.EstadoPedido;
+import com.lucas.api_restaurante.pedidomesa.PedidoMesa;
+import com.lucas.api_restaurante.pedidosalao.PedidoSalao;
+import com.lucas.api_restaurante.pedidosalao.PedidoSalaoRequestDto;
+import com.lucas.api_restaurante.pedidosalao.PedidoSalaoResponseDto;
 import com.lucas.api_restaurante.produto.Produto;
 import com.lucas.api_restaurante.produto.ProdutoRepository;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
@@ -22,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +41,9 @@ public class PedidoDeliveryService {
     private final ClienteRepository clienteRepository;
     private final ProdutoRepository produtoRepository;
     private final GarcomRepository garcomRepository;
+    private final AcompanhanteRepository acompanhanteRepository;
+    private final ItemPedidoRepository itemPedidoRepository;
+    private final ItemAcompanhanteRepository    itemAcompanhanteRepository;
 
 
     public ApiResponse<List<PedidoDelivery>> listarPedidos(Pageable pageable, String path) {
@@ -57,7 +68,7 @@ public class PedidoDeliveryService {
     }
 
     @Transactional
-    public ApiResponse<PedidoDeliveryResponseDto> criarPedido(PedidoDeliveryRequestDto pedido, String path) {
+    public ApiResponse<PedidoDeliveryResponseDto> criarPedido(PedidoDeliveryRequestDto pedidoRequest, String path) throws RecursoNaoEncontradoException{
         var turnoAtivo = turnoService.obterTurnoAtivo().data();
 
         if (turnoAtivo.isEmpty()) {
@@ -69,25 +80,33 @@ public class PedidoDeliveryService {
         novoPedido.setHora(LocalTime.now());
         novoPedido.setEstado(EstadoPedido.ABERTO);
         novoPedido.setTurno(turnoAtivo.get());
-        novoPedido.setPrevisaoChegada(pedido.previsaoChegada());
+        novoPedido.setPrevisaoChegada(pedidoRequest.previsaoChegada());
 
-        var cliente = clienteRepository.findByEmail(pedido.email()).orElseThrow(() -> new RuntimeException("Não foi possível efetuar este pedido porque o email introduzido não é válido."));
+        var cliente = clienteRepository.findByEmail(pedidoRequest.email()).orElseThrow(() -> new RuntimeException("Não foi possível efetuar este pedido porque o email introduzido não é válido."));
         novoPedido.setCliente(cliente);
-        novoPedido.setDescricao(pedido.descricao());
+        novoPedido.setDescricao(pedidoRequest.descricao());
 
         var usuario = SecurityContextHolder.getContext().getAuthentication();
 
         var garcom = garcomRepository.findById(((Usuario) usuario.getPrincipal()).getId()).orElseThrow(() -> new RuntimeException("Garcom não logado"));
         novoPedido.setGarcom(garcom);
 
-        List<ItemPedido> itens = pedido.itensDoPedido().stream().map(item -> {
-            var produto = produtoRepository.findById(item.idProduto()).orElseThrow(()->new RuntimeException("Produto não encontrado"));
+        List<ItemPedido> itens = new ArrayList<>();
 
-            var precoTotal = produto.getPrecoVenda().multiply(BigDecimal.valueOf(item.quantidade()));
+        for (ItemPedidoRequestDto itemRequest : pedidoRequest.itensDoPedido()) {
 
-            return new ItemPedido(item.quantidade(), produto.getPrecoVenda(), precoTotal, item.observacao(), produto, novoPedido);
+            var produto = produtoRepository.findById(itemRequest.idProduto()).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
-        }).collect(Collectors.toList());
+            if (itemRequest.quantidade() < 0) {
+                throw new RuntimeException("A quantidade de produtos deve ser um número maior que zero");
+            }
+
+            var precoTotal = produto.getPrecoVenda().multiply(BigDecimal.valueOf(itemRequest.quantidade()));
+
+            var novoItem = new ItemPedido(itemRequest.quantidade(), produto.getPrecoVenda(), precoTotal, itemRequest.observacao(), produto, novoPedido);
+            itens.add(novoItem);
+
+        }
 
         novoPedido.setItens(itens);
         var valorTotal = itens.stream().map(ItemPedido::getPrecoTotal)
@@ -95,13 +114,50 @@ public class PedidoDeliveryService {
 
         novoPedido.setValorTotal(valorTotal);
         var pedidoCriado = pedidoRepository.save(novoPedido);
+
+
+        for (ItemPedidoRequestDto itemRequest : pedidoRequest.itensDoPedido()) {
+            var produto = produtoRepository.findById(itemRequest.idProduto()).orElseThrow(() -> new RecursoNaoEncontradoException("Não foi encontrado um pedido com id" + itemRequest.idProduto()));
+            var itemPedido = itemPedidoRepository.findByProdutoAndPedido(produto,pedidoCriado);
+
+            if(produto.getCategoria().getNome().equalsIgnoreCase("Pratos a Peixe") && itemRequest.idsAcompanhantes().isEmpty()){
+                throw new  IllegalArgumentException("Selecione acompanhantes para este prato.");
+            }
+
+            if (!itemRequest.idsAcompanhantes().isEmpty()) {
+
+                for (Long idAcompanhante : itemRequest.idsAcompanhantes()) {
+
+                    Acompanhante acompanhante = acompanhanteRepository.findById(idAcompanhante).orElseThrow(() -> new RecursoNaoEncontradoException("Não foi encontrado um acompanhante com id " + idAcompanhante));
+                    var novoItemAcompanhante = new ItemAcompanhante();
+                    novoItemAcompanhante.setItemPedido(itemPedido);
+                    novoItemAcompanhante.setAcompanhante(acompanhante);
+                    itemAcompanhanteRepository.save(novoItemAcompanhante);
+
+                }
+            }
+        }
+
         return ResponseUtil.sucess(this.responseDto(pedidoCriado), "Pedido criado com sucesso", path + pedidoCriado.getId());
     }
 
     private PedidoDeliveryResponseDto responseDto(PedidoDelivery pedido) {
+
+        var itens = pedido.getItens().stream()
+                .map(item -> {
+
+                    List<String> nomesDeAcompanhantes = new ArrayList<>();
+                    if (!acompanhanteRepository.findByItemPedido(item.getId()).isEmpty()) {
+
+                        nomesDeAcompanhantes = acompanhanteRepository.findByItemPedido(item.getId())
+                                .stream().map(Acompanhante::getNome).toList();
+                    }
+                    return new ItemPedidoResponseDto(item, nomesDeAcompanhantes);
+                }).toList();
+
         return new PedidoDeliveryResponseDto(
                 pedido.getId(),
-                pedido.getItens(),
+                itens,
                 pedido.getCliente().getNome(),
                 pedido.getGarcom().getNome(),
                 pedido.getValorTotal(),
@@ -109,6 +165,7 @@ public class PedidoDeliveryService {
                 pedido.getEstado()
         );
     }
+
 
     public ApiResponse<ItemPedido> adicionarItem(Long idPedido, ItemPedidoRequestDto itemRequestDto, String path) {
 

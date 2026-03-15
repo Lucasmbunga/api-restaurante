@@ -1,6 +1,7 @@
 package com.lucas.api_restaurante.pedidodelivery;
 
 import com.lucas.api_restaurante.itempedido.ItemPedido;
+import com.lucas.api_restaurante.itempedido.ItemPedidoResponseDto;
 import com.lucas.api_restaurante.pedido.EstadoPedido;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public record PedidoDeliveryResponseDto(
                                         @NotNull Long id,
-                                        @NotEmpty List<ItemPedido> itens,
+                                        @NotEmpty List<ItemPedidoResponseDto> itens,
                                         String nomeCliente,
                                         @NotBlank String nomeGarcom,
                                         @NotNull

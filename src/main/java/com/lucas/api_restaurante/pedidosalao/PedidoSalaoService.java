@@ -1,11 +1,14 @@
 package com.lucas.api_restaurante.pedidosalao;
 
+import com.lucas.api_restaurante.acompanhante.Acompanhante;
+import com.lucas.api_restaurante.acompanhante.AcompanhanteRepository;
 import com.lucas.api_restaurante.cliente.ClienteRepository;
 import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
 import com.lucas.api_restaurante.garcom.GarcomRepository;
-import com.lucas.api_restaurante.itempedido.ItemPedido;
-import com.lucas.api_restaurante.itempedido.ItemPedidoDeleteRequestDto;
-import com.lucas.api_restaurante.itempedido.ItemPedidoRequestDto;
+import com.lucas.api_restaurante.itemacompanhante.ItemAcompanhante;
+import com.lucas.api_restaurante.itemacompanhante.ItemAcompanhanteRepository;
+import com.lucas.api_restaurante.itempedido.*;
+import com.lucas.api_restaurante.mesa.Mesa;
 import com.lucas.api_restaurante.mesa.MesaRepository;
 import com.lucas.api_restaurante.pedido.EstadoPedido;
 import com.lucas.api_restaurante.pedidodelivery.*;
@@ -18,6 +21,7 @@ import com.lucas.api_restaurante.responseutils.ResponseUtil;
 import com.lucas.api_restaurante.turno.TurnoService;
 import com.lucas.api_restaurante.usuario.Usuario;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,10 +30,12 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PedidoSalaoService {
     private final PedidoSalaoRepository pedidoRepository;
     private final TurnoService turnoService;
@@ -38,49 +44,50 @@ public class PedidoSalaoService {
     private final GarcomRepository garcomRepository;
     private final MesaRepository mesaRepository;
     private final PedidoMesaRepository pedidoMesaRepository;
+    private final AcompanhanteRepository acompanhanteRepository;
+    private final ItemAcompanhanteRepository itemAcompanhanteRepository;
+    private final ItemPedidoRepository itemPedidoRepository;
 
-    public PedidoSalaoService(PedidoSalaoRepository pedidoRepository,
-                              TurnoService turnoService, ClienteRepository clienteRepository,
-                              ProdutoRepository produtoRepository, GarcomRepository garcomRepository,
-                              MesaRepository mesaRepository,
-                              PedidoMesaRepository pedidoMesaRepository) {
-        this.pedidoRepository = pedidoRepository;
-        this.turnoService = turnoService;
-        this.clienteRepository = clienteRepository;
-        this.produtoRepository = produtoRepository;
-        this.garcomRepository = garcomRepository;
-        this.mesaRepository = mesaRepository;
-        this.pedidoMesaRepository = pedidoMesaRepository;
-    }
 
-    public ApiResponse<List<PedidoSalao>> listarPedidos(Pageable pageable, String path) {
-        List<PedidoSalao> pedidos = pedidoRepository.findAll(pageable).getContent();
+    public ApiResponse<List<PedidoSalaoResponseDto>> listarPedidos(Pageable pageable, String path) throws RecursoNaoEncontradoException {
+        List<PedidoSalaoResponseDto> pedidos = new ArrayList<>();
+        for (PedidoSalao pedidoSalao : pedidoRepository.findAll(pageable).getContent()) {
+            PedidoSalaoResponseDto pedidoSalaoResponseDto = responseDto(pedidoSalao);
+            pedidos.add(pedidoSalaoResponseDto);
+        }
 
         return ResponseUtil.sucess(pedidos, "Sucesso", path);
     }
 
-    public ApiResponse<PedidoSalaoResponseDto> buscarPedidoPorId(Long id, String path) throws RecursoNaoEncontradoException{
+    public ApiResponse<PedidoSalaoResponseDto> buscarPedidoPorId(Long id, String path) throws RecursoNaoEncontradoException {
         var pedido = pedidoRepository.findById(id).orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
         return ResponseUtil.sucess(this.responseDto(pedido), "Sucesso", path);
     }
 
-    public ApiResponse<List<PedidoSalao>> filtrarPedidos(Pageable pageable, EstadoPedido estado, LocalDate data, LocalTime hora, String path) {
+    public ApiResponse<List<PedidoSalaoResponseDto>> filtrarPedidos(Pageable pageable, EstadoPedido estado, LocalDate data, LocalTime hora, String path) throws RecursoNaoEncontradoException {
         Specification<PedidoSalao> pedidos = Specification.allOf(
                         PedidoSalaoSpacification.comEstadoPedido(estado))
                 .and(PedidoSalaoSpacification.comData(data))
                 .and(PedidoSalaoSpacification.comHora(hora));
 
-        return ResponseUtil.sucess(pedidoRepository.findAll(pedidos, pageable).getContent(), "Sucesso", path);
+        List<PedidoSalaoResponseDto> responseDtos = new ArrayList<>();
+
+        for (PedidoSalao pedidoSalao : pedidoRepository.findAll(pageable).getContent()) {
+            PedidoSalaoResponseDto responseDto = responseDto(pedidoSalao);
+            responseDtos.add(responseDto);
+        }
+
+        return ResponseUtil.sucess(responseDtos, "Sucesso", path);
 
     }
 
-    public ApiResponse<List<PedidoSalaoResponseDto>>  buscarPedidosPorMesa(Long idMesa,String path) throws RecursoNaoEncontradoException{
-        if(!mesaRepository.existsById(idMesa)){
+    public ApiResponse<List<PedidoSalaoResponseDto>> buscarPedidosPorMesa(Long idMesa, String path) throws RecursoNaoEncontradoException {
+        if (!mesaRepository.existsById(idMesa)) {
             throw new RecursoNaoEncontradoException("Mesa não encontrada.");
         }
 
-        var pedidos=mesaRepository.findPedido(idMesa).orElseThrow(()->new RecursoNaoEncontradoException("Nenhum pedido foiencontrado nesta mesa"));
-        var response=pedidos.stream().map(pedido-> {
+        var pedidos = mesaRepository.findPedido(idMesa).orElseThrow(() -> new RecursoNaoEncontradoException("Nenhum pedido foiencontrado nesta mesa"));
+        var response = pedidos.stream().map(pedido -> {
             try {
                 return responseDto(pedido);
             } catch (RecursoNaoEncontradoException e) {
@@ -89,8 +96,9 @@ public class PedidoSalaoService {
         }).collect(Collectors.toList());
         return ResponseUtil.sucess(response, "Sucesso", path);
     }
+
     @Transactional
-    public ApiResponse<PedidoSalaoResponseDto> criarPedido(PedidoSalaoRequestDto pedido, String path) throws RecursoNaoEncontradoException{
+    public ApiResponse<PedidoSalaoResponseDto> criarPedido(PedidoSalaoRequestDto pedidoRequest, String path) throws RecursoNaoEncontradoException {
         var turnoAtivo = turnoService.obterTurnoAtivo().data();
 
         if (turnoAtivo.isEmpty()) {
@@ -102,14 +110,13 @@ public class PedidoSalaoService {
         novoPedido.setHora(LocalTime.now());
         novoPedido.setEstado(EstadoPedido.ABERTO);
         novoPedido.setTurno(turnoAtivo.get());
-        novoPedido.setDescricao(pedido.descricao());
+        novoPedido.setDescricao(pedidoRequest.descricao());
 
-        if (pedido.idCliente() != null) {
+        if (pedidoRequest.idCliente() != null) {
 
-            var cliente = clienteRepository.findById(pedido.idCliente()).orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
+            var cliente = clienteRepository.findById(pedidoRequest.idCliente()).orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
             novoPedido.setCliente(cliente);
         }
-
 
         var usuario = SecurityContextHolder.getContext().getAuthentication();
         if (usuario == null) {
@@ -119,17 +126,22 @@ public class PedidoSalaoService {
         var garcom = garcomRepository.findById(((Usuario) usuario.getPrincipal()).getId()).orElseThrow(() -> new RuntimeException("Garcom não encontrado"));
         novoPedido.setGarcom(garcom);
 
-        List<ItemPedido> itens = pedido.itensDoPedido().stream().map(item -> {
-            var produto = produtoRepository.findById(item.idProduto()).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        List<ItemPedido> itens = new ArrayList<>();
 
-            if (item.quantidade() < 0) {
+        for (ItemPedidoRequestDto itemRequest : pedidoRequest.itensDoPedido()) {
+
+            var produto = produtoRepository.findById(itemRequest.idProduto()).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+            if (itemRequest.quantidade() < 0) {
                 throw new RuntimeException("A quantidade de produtos deve ser um número maior que zero");
             }
-            var precoTotal = produto.getPrecoVenda().multiply(BigDecimal.valueOf(item.quantidade()));
 
-            return new ItemPedido(item.quantidade(), produto.getPrecoVenda(), precoTotal, item.observacao(), produto, novoPedido);
+            var precoTotal = produto.getPrecoVenda().multiply(BigDecimal.valueOf(itemRequest.quantidade()));
 
-        }).collect(Collectors.toList());
+            var novoItem = new ItemPedido(itemRequest.quantidade(), produto.getPrecoVenda(), precoTotal, itemRequest.observacao(), produto, novoPedido);
+            itens.add(novoItem);
+
+        }
 
         novoPedido.setItens(itens);
         var valorTotal = itens.stream().map(ItemPedido::getPrecoTotal)
@@ -138,10 +150,33 @@ public class PedidoSalaoService {
         novoPedido.setValorTotal(valorTotal);
         var pedidoCriado = pedidoRepository.save(novoPedido);
 
-        if (pedido.idMesa() != null) {
-            var mesa = mesaRepository.findById(pedido.idMesa()).orElseThrow(() -> new RuntimeException("Mesa não encontrada"));
+        for (ItemPedidoRequestDto itemRequest : pedidoRequest.itensDoPedido()) {
+            var produto = produtoRepository.findById(itemRequest.idProduto()).orElseThrow(() -> new RecursoNaoEncontradoException("Não foi encontrado um pedido com id" + itemRequest.idProduto()));
+            var itemPedido = itemPedidoRepository.findByProdutoAndPedido(produto,pedidoCriado);
+
+            if(produto.getCategoria().getNome().equalsIgnoreCase("Pratos a Peixe") && itemRequest.idsAcompanhantes().isEmpty()){
+                throw new  IllegalArgumentException("Selecione acompanhantes para este prato.");
+            }
+
+            if (!itemRequest.idsAcompanhantes().isEmpty()) {
+
+                for (Long idAcompanhante : itemRequest.idsAcompanhantes()) {
+
+                    Acompanhante acompanhante = acompanhanteRepository.findById(idAcompanhante).orElseThrow(() -> new RecursoNaoEncontradoException("Não foi encontrado um acompanhante com id " + idAcompanhante));
+                    var novoItemAcompanhante = new ItemAcompanhante();
+                    novoItemAcompanhante.setItemPedido(itemPedido);
+                    novoItemAcompanhante.setAcompanhante(acompanhante);
+                    itemAcompanhanteRepository.save(novoItemAcompanhante);
+
+                }
+            }
+
+        }
+
+        if (pedidoRequest.idMesa() != null) {
+            var mesa = mesaRepository.findById(pedidoRequest.idMesa()).orElseThrow(() -> new RuntimeException("Mesa não encontrada"));
             mesa.setEstaOcupada(true);
-            PedidoMesa  novoPedidoMesa = new PedidoMesa();
+            PedidoMesa novoPedidoMesa = new PedidoMesa();
             novoPedidoMesa.setPedido(pedidoCriado);
             novoPedidoMesa.setMesa(mesa);
             pedidoMesaRepository.save(novoPedidoMesa);
@@ -151,11 +186,24 @@ public class PedidoSalaoService {
         return ResponseUtil.sucess(this.responseDto(pedidoCriado), "Pedido criado com sucesso", path + pedidoCriado.getId());
     }
 
-    private PedidoSalaoResponseDto responseDto(PedidoSalao pedido) throws RecursoNaoEncontradoException{
-        var mesa = mesaRepository.findByPedido(pedido.getId()).orElseThrow(()->new RecursoNaoEncontradoException("Mesa não encontrada."));
+    private PedidoSalaoResponseDto responseDto(PedidoSalao pedido) throws RecursoNaoEncontradoException {
+        var mesa = mesaRepository.findByPedido(pedido.getId()).orElseThrow(() -> new RecursoNaoEncontradoException("Mesa não encontrada."));
+
+        var itens = pedido.getItens().stream()
+                .map(item -> {
+
+                    List<String> nomesDeAcompanhantes = new ArrayList<>();
+                    if (!acompanhanteRepository.findByItemPedido(item.getId()).isEmpty()) {
+
+                        nomesDeAcompanhantes = acompanhanteRepository.findByItemPedido(item.getId())
+                                .stream().map(Acompanhante::getNome).toList();
+                    }
+                    return new ItemPedidoResponseDto(item, nomesDeAcompanhantes);
+                }).toList();
+
         return new PedidoSalaoResponseDto(
                 pedido.getId(),
-                pedido.getItens(),
+                itens,
                 pedido.getCliente().getNome(),
                 pedido.getGarcom().getNome(),
                 mesa.getNumeroMesa(),
@@ -250,7 +298,38 @@ public class PedidoSalaoService {
     }
 
     @Transactional
-    public ApiResponse<PedidoSalaoResponseDto> finalizarPedido(Long idPedido, String path) throws RecursoNaoEncontradoException{
+    public ApiResponse<List<PedidoSalaoResponseDto>> juntarMesas(PedidoSalaoJoinDto pedidoSalaoJoinDto) throws RecursoNaoEncontradoException {
+        Mesa mesaOrigem = mesaRepository.findById(pedidoSalaoJoinDto.idMesaOrigem()).orElseThrow(() -> new RecursoNaoEncontradoException("Mesa de origem não foi encontrada."));
+        Mesa mesaDestino = mesaRepository.findById(pedidoSalaoJoinDto.idMesaDestino()).orElseThrow(() -> new RecursoNaoEncontradoException("Mesa de destino não foi encontrada."));
+
+        List<PedidoSalao> pedidos = pedidoRepository.findByIdMesaAndEstado(mesaOrigem.getId());
+
+        if (pedidos.isEmpty()) {
+            throw new IllegalArgumentException("Não foi possível efetuar esta operação. Selecione uma mesa com pedidos aberto ou em preparação.");
+        }
+
+        pedidos.forEach(pedido -> {
+
+            PedidoMesa pedidoMesa = pedidoMesaRepository.findByMesaAndPedido(mesaOrigem, pedido).get();
+            pedidoMesa.setMesa(mesaDestino);
+            pedidoMesaRepository.save(pedidoMesa);
+
+            // Ao juntar duas mesas, a mesa de origem deve ser liberada.
+            liberarMesa(pedido);
+
+        });
+
+        List<PedidoSalaoResponseDto> responseDtos = new ArrayList<>();
+        for (PedidoSalao pedido : pedidos) {
+            PedidoSalaoResponseDto pedidoSalaoResponseDto = responseDto(pedido);
+            responseDtos.add(pedidoSalaoResponseDto);
+        }
+
+        return ResponseUtil.sucess(responseDtos, "Sucesso", "");
+    }
+
+    @Transactional
+    public ApiResponse<PedidoSalaoResponseDto> finalizarPedido(Long idPedido, String path) throws RecursoNaoEncontradoException {
 
         //Esta função verifica se o pedido existe e se ainda está aberto ou em preparação para sofrer alguma alteração
 
@@ -259,18 +338,24 @@ public class PedidoSalaoService {
         pedido.setEstado(EstadoPedido.FECHADO);
         pedidoRepository.save(pedido);
 
-       /* var mesa = mesaRepository.findByPedido(pedido.getId()).orElseThrow(()->new RecursoNaoEncontradoException("Mesa não encontrada"));
+        // Ao finalizar um pedido se não tiver mais pedidos abertos ou em preparação na mesa onde estava este pedido, então esta mesa deve ser liberada.
+        liberarMesa(pedido);
 
-        if (mesa!=null) {
-            mesa.setEstaOcupada(false);
-            mesaRepository.save(mesa);
+        return ResponseUtil.sucess(this.responseDto(pedido), "Pedido fechado com sucesso!", path + idPedido);
+    }
+
+    public void liberarMesa(PedidoSalao pedidoSalao) {
+
+        var mesa = mesaRepository.findByPedido(pedidoSalao.getId());
+
+        if (mesa.isPresent() && pedidoRepository.findByIdMesaAndEstado(mesa.get().getId()).isEmpty()) {
+            mesa.get().setEstaOcupada(false);
+            mesaRepository.save(mesa.get());
         }
-      */
-        return ResponseUtil.sucess(this.responseDto(pedido), "Pedido fechado", path + idPedido);
     }
 
     @Transactional
-    public ApiResponse<PedidoSalaoResponseDto> cancelarPedido(Long idPedido, String path) throws RecursoNaoEncontradoException{
+    public ApiResponse<PedidoSalaoResponseDto> cancelarPedido(Long idPedido, String path) throws RecursoNaoEncontradoException {
 
         //Esta função verifica se o pedido existe e se ainda está aberto ou em preparação para sofrer alguma alteração
         var pedido = this.verificarEstadoPedido(idPedido, "Este pedido não  está aberto");
@@ -278,13 +363,8 @@ public class PedidoSalaoService {
         pedido.setEstado(EstadoPedido.CANCELADO);
         pedidoRepository.save(pedido);
 
-        /* var mesa = mesaRepository.findByPedido(pedido.getId()).orElseThrow(()->new RecursoNaoEncontradoException("Mesa não encontrada"));
-
-        if (mesa!=null) {
-            mesa.setEstaOcupada(false);
-            mesaRepository.save(mesa);
-        }
-      */
+        // Ao cancelar um pedido se não tiver mais pedidos abertos ou em preparação na mesa onde estava este pedido, então esta mesa deve ser liberada.
+        liberarMesa(pedido);
         return ResponseUtil.sucess(this.responseDto(pedido), "Pedido cancelado", path);
     }
 
@@ -300,18 +380,13 @@ public class PedidoSalaoService {
     }
 
     @Transactional
-    public ApiResponse<Void> excluirPedido(Long id, String path) {
-        var pedido = pedidoRepository.findById(id);
+    public ApiResponse<PedidoSalaoResponseDto> excluirPedido(Long id, String path) throws RecursoNaoEncontradoException {
+        var pedido = pedidoRepository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Não foi possível efetuar esta operação. Pedido    não encontrado."));
 
-      /*  var mesa = mesaRepository.findContainingPedido(pedido.get());
+        // Ao excluir um pedido se não tiver mais pedidos abertos ou em preparação na mesa onde estava este pedido, então esta mesa deve ser liberada.
+        liberarMesa(pedido);
 
-        if (mesa.isPresent()) {
-            mesa.get().excluirPedido(pedido.get());
-            mesaRepository.save(mesa.get());
-        }
-       */
-
-        pedidoRepository.deleteById(id);
-        return ResponseUtil.sucess("Pedido excluído com sucesso", path);
+        pedidoRepository.delete(pedido);
+        return ResponseUtil.sucess(responseDto(pedido), "Pedido excluído com sucesso", path);
     }
 }

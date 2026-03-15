@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/acompanhantes")
+@RequestMapping("/acompanhantes")
 public class AcompanhanteController {
 
     public final AcompanhanteService acompanhanteService;
@@ -24,12 +24,12 @@ public class AcompanhanteController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Acompanhante>>> listarAcompanhantes(@PageableDefault(page = 0,size = 10,direction = Sort.Direction.ASC,sort = "nome") Pageable pageable){
-        return ResponseEntity.ok(acompanhanteService.listarAcompanhantes(pageable,"/api/acompanhantes"));
+        return ResponseEntity.ok(acompanhanteService.listarAcompanhantes(pageable,"/acompanhantes"));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Acompanhante>> buscarAcompanhantePorId(@PathVariable Long id) throws RecursoNaoEncontradoException {
-        return ResponseEntity.ok(acompanhanteService.buscarAcompanhantePorId(id,"/api/acompanhantes/"));
+        return ResponseEntity.ok(acompanhanteService.buscarAcompanhantePorId(id,"/acompanhantes/"));
     }
     @PostMapping
     public ResponseEntity<ApiResponse<Acompanhante>> cadastrarAcompanhante(@RequestBody Acompanhante acompanhante){
@@ -38,11 +38,11 @@ public class AcompanhanteController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Acompanhante>> editarAcompanhante(@PathVariable Long id, @RequestBody Acompanhante acompanhante) throws RecursoNaoEncontradoException{
-        return ResponseEntity.ok(acompanhanteService.editarAcompanhante(id,acompanhante,"/api/acompanhantes/"));
+        return ResponseEntity.ok(acompanhanteService.editarAcompanhante(id,acompanhante,"/acompanhantes/"));
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<ApiResponse<Void>> excluirAcompanhante(@PathVariable Long id) throws RecursoNaoEncontradoException{
-        return ResponseEntity.ok(acompanhanteService.deletarAcompanhante(id,"/api/acompanhantes/"));
+        return ResponseEntity.ok(acompanhanteService.deletarAcompanhante(id,"/acompanhantes/"));
     }
 }

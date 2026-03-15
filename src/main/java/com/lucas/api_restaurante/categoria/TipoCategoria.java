@@ -8,7 +8,7 @@ public enum TipoCategoria {
     PRATOS("pratos"),
     BEBIDAS("bebidas"),
     SOBREMESAS("sobremesas"),
-    ENTRADAS("entradas"),;
+    ENTRADAS("entradas");
     private String valor;
 
     TipoCategoria(String valor) {

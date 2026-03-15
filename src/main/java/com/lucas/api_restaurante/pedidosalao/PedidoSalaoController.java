@@ -6,6 +6,7 @@ import com.lucas.api_restaurante.itempedido.ItemPedidoDeleteRequestDto;
 import com.lucas.api_restaurante.itempedido.ItemPedidoRequestDto;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,7 +27,7 @@ public class PedidoSalaoController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PedidoSalao>>> listarPedidos(@PageableDefault(page = 0, size = 10, direction = Sort.Direction.ASC, sort = "data") Pageable pageable) {
+    public ResponseEntity<ApiResponse<List<PedidoSalaoResponseDto>>> listarPedidos(@PageableDefault(page = 0, size = 10, direction = Sort.Direction.ASC, sort = "data") Pageable pageable) throws RecursoNaoEncontradoException{
         return ResponseEntity.ok(pedidoSalaoService.listarPedidos(pageable, "/pedidos-delivery"));
 
     }
@@ -40,6 +41,7 @@ public class PedidoSalaoController {
     public ResponseEntity<ApiResponse<List<PedidoSalaoResponseDto>>> filtrarPedidos(@RequestParam("idMesa") Long idMesa)throws RecursoNaoEncontradoException {
         return ResponseEntity.ok(pedidoSalaoService.buscarPedidosPorMesa(idMesa,"/mesas/filtrar"));
     }
+
     @PostMapping
     @Transactional
     public ResponseEntity<ApiResponse<PedidoSalaoResponseDto>> criarPedido(@RequestBody PedidoSalaoRequestDto pedidoRequest) throws RecursoNaoEncontradoException{
@@ -62,13 +64,21 @@ public class PedidoSalaoController {
         return ResponseEntity.ok(pedidoSalaoService.cancelarPedido(id, "/pedidos-delivery/"+id));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> excluirPedido(@PathVariable Long id) {
-        return ResponseEntity.ok(pedidoSalaoService.excluirPedido(id, "/pedidos-delivery/"+id));
-    }
-
-    @DeleteMapping("/{idPedido}/{idItem}")
+    @PutMapping("/{idPedido}/{idItem}")
     public ResponseEntity<ApiResponse<Void>> excluirItemPedido(@PathVariable Long idPedido, @PathVariable Long idItem, @RequestBody ItemPedidoDeleteRequestDto itemPedidoDeleteRequestDto) {
         return ResponseEntity.ok(pedidoSalaoService.excluirItem(idPedido,idItem,itemPedidoDeleteRequestDto));
     }
+
+    @PutMapping("/transferir")
+    public ResponseEntity<ApiResponse<List<PedidoSalaoResponseDto>>> justarMesas(@RequestBody @Valid PedidoSalaoJoinDto pedidoSalaoJoinDto)throws RecursoNaoEncontradoException {
+
+        return ResponseEntity.ok(pedidoSalaoService.juntarMesas(pedidoSalaoJoinDto));
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<PedidoSalaoResponseDto>> excluirPedido(@PathVariable Long id) throws RecursoNaoEncontradoException{
+        return ResponseEntity.ok(pedidoSalaoService.excluirPedido(id, "/pedidos-delivery/"+id));
+    }
+
 }

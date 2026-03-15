@@ -4,7 +4,6 @@ import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
 import com.lucas.api_restaurante.pedido.EstadoPedido;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
-import org.antlr.v4.runtime.RecognitionException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
