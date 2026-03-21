@@ -3,7 +3,7 @@ package com.lucas.api_restaurante.turno;
 import com.lucas.api_restaurante.caixa.Caixa;
 import com.lucas.api_restaurante.caixa.CaixaAberturaResponseDto;
 import com.lucas.api_restaurante.caixa.CaixaRepository;
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
 import com.lucas.api_restaurante.saidacaixa.SaidaCaixa;
@@ -11,7 +11,6 @@ import com.lucas.api_restaurante.usuario.Usuario;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,7 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TurnoService {
@@ -36,15 +34,15 @@ public class TurnoService {
         return ResponseUtil.sucess(turnos, "Sucesso", path);
     }
 
-    public ApiResponse<Turno> buscarTurnoPorId(Long id, String path) throws RecursoNaoEncontradoException {
+    public ApiResponse<Turno> buscarTurnoPorId(Long id, String path) throws NotFoundException {
         if (turnoRepository.findById(id).isEmpty()) {
-            throw new RecursoNaoEncontradoException("Não foi encontrado um turno com id " + id);
+            throw new NotFoundException("Não foi encontrado um turno com id " + id);
         }
         return ResponseUtil.sucess(turnoRepository.findById(id).get(), "Sucesso", path);
     }
 
     @Transactional
-    public ApiResponse<TurnoResponseDto> abrirTurno(BigDecimal valorInicial) throws RecursoNaoEncontradoException {
+    public ApiResponse<TurnoResponseDto> abrirTurno(BigDecimal valorInicial) throws NotFoundException {
 
         if (turnoRepository.findByStatus(StatusTurno.ABERTO).isPresent()) {
             throw new IllegalStateException("Erro ao tentar abrir o Turno. Já tem um turno aberto.");
@@ -64,7 +62,7 @@ public class TurnoService {
         var garcomLogado = SecurityContextHolder.getContext().getAuthentication();
 
         if (garcomLogado == null) {
-            throw new RecursoNaoEncontradoException("Garçom não logado");
+            throw new NotFoundException("Garçom não logado");
         }
         var responsavelPelaAbertura = (Usuario) garcomLogado.getPrincipal();
         TurnoResponseDto turnoResponse = new TurnoResponseDto(turnoAberto.getId(), turnoAberto.getData(), turnoAberto.getHoraAbertura(), turnoAberto.getStatus(), responsavelPelaAbertura.getNome(), new CaixaAberturaResponseDto(novaCaixa.getId(), novaCaixa.getValorInicial()));
@@ -80,15 +78,15 @@ public class TurnoService {
     }
 
     @Transactional
-    public ApiResponse<FechoTurnoResponseDto> fecharTurno() throws RecursoNaoEncontradoException {
+    public ApiResponse<FechoTurnoResponseDto> fecharTurno() throws NotFoundException {
 
         var turnoAtivo = this.obterTurnoAtivo().data()
-                .orElseThrow(()->new RecursoNaoEncontradoException("Nenhuma turno aberto."));
+                .orElseThrow(()->new NotFoundException("Nenhuma turno aberto."));
 
         turnoAtivo.setStatus(StatusTurno.FECHADO);
         turnoAtivo.setHoraFecho(LocalTime.now());
 
-        var caixaAberta = caixaRepository.findByTurno(turnoAtivo).orElseThrow(()->new RecursoNaoEncontradoException("Caixa não encontrado."));
+        var caixaAberta = caixaRepository.findByTurno(turnoAtivo).orElseThrow(()->new NotFoundException("Caixa não encontrado."));
 
         BigDecimal totalEntradas;
         BigDecimal faturamentoLiquido;

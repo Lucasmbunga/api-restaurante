@@ -1,8 +1,7 @@
 package com.lucas.api_restaurante.entradacaixa;
 
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +25,7 @@ public class EntradasCaixaController {
     }
 
     @GetMapping("/{idTurno}/entradas-caixa")
-    public ResponseEntity<ApiResponse<List<EntradaCaixa>>> listarEntradasCaixaPorTurno(@PathVariable Long idTurno)throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<List<EntradaCaixa>>> listarEntradasCaixaPorTurno(@PathVariable Long idTurno)throws NotFoundException {
         return ResponseEntity.ok(entradaCaixaService.listarEntradasCaixaPorTurno(idTurno,idTurno+"/entradas-caixa"));
     }
     @GetMapping("/filtrar-por-data")

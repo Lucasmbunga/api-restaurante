@@ -1,12 +1,11 @@
 package com.lucas.api_restaurante.produto;
 
 import com.lucas.api_restaurante.categoria.CategoriaRepository;
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class ProdutoService {
         this.categoriaRepository = categoriaRepository;
     }
 
-    public ApiResponse<ProdutoResponseDto> cadastrarProduto(ProdutoRequestDto produtoRequestDto, String path) throws RecursoNaoEncontradoException {
+    public ApiResponse<ProdutoResponseDto> cadastrarProduto(ProdutoRequestDto produtoRequestDto, String path) throws NotFoundException {
 
         var categoria = categoriaRepository.findById(produtoRequestDto.idCategoria()).get();
         Produto novoProduto = new Produto();
@@ -75,16 +74,16 @@ public class ProdutoService {
 
     }
 
-    public void verificarProdutoPorId(Long id) throws RecursoNaoEncontradoException {
+    public void verificarProdutoPorId(Long id) throws NotFoundException {
         if (!produtoRepository.existsById(id)) {
-            throw new RecursoNaoEncontradoException("Não foi encontrado um produto com id " + id);
+            throw new NotFoundException("Não foi encontrado um produto com id " + id);
         }
     }
 
-    public void verificarCategoriaDoProduto(Long id, String nomeProduto) throws RecursoNaoEncontradoException {
+    public void verificarCategoriaDoProduto(Long id, String nomeProduto) throws NotFoundException {
         var categoria = categoriaRepository.findById(id);
         if (categoria.isEmpty()) {
-            throw new RecursoNaoEncontradoException("Não foi encontrada um categoria com id " +
+            throw new NotFoundException("Não foi encontrada um categoria com id " +
                     id + "especificado para o produto " + nomeProduto);
         }
     }

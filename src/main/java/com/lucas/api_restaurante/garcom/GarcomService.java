@@ -1,6 +1,6 @@
 package com.lucas.api_restaurante.garcom;
 
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
 import com.lucas.api_restaurante.telefone.Telefone;
@@ -61,9 +61,9 @@ public class GarcomService {
         return ResponseUtil.sucess(listaDeGarcons, "Sucesso", path);
     }
 
-    public ApiResponse<GarcomResponseDto> buscarGarcomPorId(Long id, String path) throws RecursoNaoEncontradoException {
+    public ApiResponse<GarcomResponseDto> buscarGarcomPorId(Long id, String path) throws NotFoundException {
         if (garcomRepository.findById(id).isEmpty()) {
-            throw new RecursoNaoEncontradoException("Não foi Encontrado um Garçom com id " + id);
+            throw new NotFoundException("Não foi Encontrado um Garçom com id " + id);
         }
         return ResponseUtil.sucess(this.entityToDto(garcomRepository.findById(id).get()), "Sucesso", path);
     }

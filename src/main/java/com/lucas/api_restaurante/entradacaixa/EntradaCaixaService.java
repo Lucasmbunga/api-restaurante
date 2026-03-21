@@ -1,7 +1,7 @@
 package com.lucas.api_restaurante.entradacaixa;
 
 import com.lucas.api_restaurante.caixa.CaixaRepository;
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.pagamento.Pagamento;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
@@ -51,8 +51,8 @@ public class EntradaCaixaService {
         return ResponseUtil.sucess(listaDeEntradasCaixa, "Sucesso", path);
     }
 
-    public ApiResponse<List<EntradaCaixa>> listarEntradasCaixaPorTurno(Long idTurno, String path) throws RecursoNaoEncontradoException {
-        var turno = turnoRepository.findById(idTurno).orElseThrow(() -> new RecursoNaoEncontradoException("Turno não encontrado"));
+    public ApiResponse<List<EntradaCaixa>> listarEntradasCaixaPorTurno(Long idTurno, String path) throws NotFoundException {
+        var turno = turnoRepository.findById(idTurno).orElseThrow(() -> new NotFoundException("Turno não encontrado"));
         var caixa = caixaRepository.findByTurno(turno).orElseThrow(()->new RuntimeException("Caixa não encontrada para o turno selecionado"));
         List<EntradaCaixa> entradasDoTurno = caixa.getEntradas();
 

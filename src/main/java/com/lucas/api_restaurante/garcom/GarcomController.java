@@ -1,6 +1,6 @@
 package com.lucas.api_restaurante.garcom;
 
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +31,7 @@ public class GarcomController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<GarcomResponseDto>> buscarGarcomPorId(@PathVariable Long id) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<GarcomResponseDto>> buscarGarcomPorId(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(garcomService.buscarGarcomPorId(id,"/garcons/"+id));
     }
 
@@ -41,7 +41,7 @@ public class GarcomController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<ApiResponse<Void>> excluirGarcom(@PathVariable Long id) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<Void>> excluirGarcom(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(garcomService.excluirGarcom(id,"/garcons/"+id));
     }
 }

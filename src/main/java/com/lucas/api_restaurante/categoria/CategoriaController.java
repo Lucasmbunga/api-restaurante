@@ -1,6 +1,6 @@
 package com.lucas.api_restaurante.categoria;
 
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +26,7 @@ public class CategoriaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Categoria>> buscarCategoriaPorId(@PathVariable Long id) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<Categoria>> buscarCategoriaPorId(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(categoriaService.buscarCategoriaPorId(id,"/categorias/"+id));
     }
@@ -37,12 +37,12 @@ public class CategoriaController {
                 .body(categoriaService.cadastrarCategoria(categoriaRequestDto,"/categorias"));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Categoria>> atualizarCategoria(@PathVariable Long id, @Valid @RequestBody CategoriaRequestDto categoriaRequestDto) throws RecursoNaoEncontradoException{
+    public ResponseEntity<ApiResponse<Categoria>> atualizarCategoria(@PathVariable Long id, @Valid @RequestBody CategoriaRequestDto categoriaRequestDto) throws NotFoundException {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(categoriaService.atualizarCategoria(id,categoriaRequestDto,"/categorias/"+id));
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> excluirCategoria(@PathVariable Long id) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<Void>> excluirCategoria(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(categoriaService.excluirCategoria(id,"/categorias"));
     }
 }

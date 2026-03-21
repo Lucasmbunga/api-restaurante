@@ -1,6 +1,6 @@
 package com.lucas.api_restaurante.mesa;
 
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,7 +26,7 @@ public class MesaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Mesa>> buscarMesaPorId(@PathVariable Long id) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<Mesa>> buscarMesaPorId(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(mesaService.buscarMesaPorId(id,"/mesas/"));
     }
 
@@ -35,16 +35,16 @@ public class MesaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(mesaService.cadastrarMesa(mesa,"/mesas/"));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Mesa>> editarMesa(@PathVariable Long id, @RequestBody Mesa mesa) throws RecursoNaoEncontradoException{
+    public ResponseEntity<ApiResponse<Mesa>> editarMesa(@PathVariable Long id, @RequestBody Mesa mesa) throws NotFoundException {
         return ResponseEntity.ok(mesaService.editarMesa(id,mesa,"/mesas/"));
     }
 
     @PutMapping("/{id}/desocupar")
-    public ResponseEntity<ApiResponse<Void>> desocuparMesa(@PathVariable Long id)throws RecursoNaoEncontradoException{
+    public ResponseEntity<ApiResponse<Void>> desocuparMesa(@PathVariable Long id)throws NotFoundException {
         return ResponseEntity.ok(mesaService.desocuparMesa(id,"/mesas/"));
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> excluirMesa(@PathVariable Long id) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<Void>> excluirMesa(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(mesaService.excluirMesa(id,"/mesas/"));
     }
  }

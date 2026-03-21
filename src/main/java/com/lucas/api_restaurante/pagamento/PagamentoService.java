@@ -3,7 +3,7 @@ package com.lucas.api_restaurante.pagamento;
 import com.lucas.api_restaurante.caixa.CaixaRepository;
 import com.lucas.api_restaurante.cliente.ClienteRepository;
 import com.lucas.api_restaurante.entradacaixa.EntradaCaixaService;
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.pedido.EstadoPedido;
 import com.lucas.api_restaurante.pedido.PedidoRepository;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
@@ -51,9 +51,9 @@ public class PagamentoService {
     }
 
     @Transactional
-    public ApiResponse<PagamentoResponseDto> registrarPagamento(PagamentoRequestDto pagamentoRequest, String path) throws RecursoNaoEncontradoException {
+    public ApiResponse<PagamentoResponseDto> registrarPagamento(PagamentoRequestDto pagamentoRequest, String path) throws NotFoundException {
 
-        var pedido = pedidoRepository.findById(pagamentoRequest.idPedido()).orElseThrow(() -> new RecursoNaoEncontradoException("Pagamento não encontrado."));
+        var pedido = pedidoRepository.findById(pagamentoRequest.idPedido()).orElseThrow(() -> new NotFoundException("Pagamento não encontrado."));
         var pagamento = pagamentoRepository.findByPedido(pedido);
 
         if (pagamento.isPresent()) {
@@ -74,23 +74,23 @@ public class PagamentoService {
         return ResponseUtil.sucess(new PagamentoResponseDto(pagamentoRegistrado,nomeCliente), "Pagamento registrado com sucesso.", path + pagamentoRegistrado.getId());
     }
 
-    public ApiResponse<PagamentoResponseDto> obterPagamentoPorId(Long id, String path) throws RecursoNaoEncontradoException {
+    public ApiResponse<PagamentoResponseDto> obterPagamentoPorId(Long id, String path) throws NotFoundException {
         Optional<Pagamento> pagamento = pagamentoRepository.findById(id);
         if (pagamento.isEmpty()) {
-            throw new RecursoNaoEncontradoException("Pagamento não encontrado.");
+            throw new NotFoundException("Pagamento não encontrado.");
         }
         String nomeCliente=this.obterClienteQuePagou(pagamento.get());
         return ResponseUtil.sucess(new PagamentoResponseDto(pagamento.get(),nomeCliente), "Sucesso", path);
     }
 
-    public ApiResponse<List<PagamentoResponseDto>> obterPagamentoPorCliente(Long idCliente, String path) throws RecursoNaoEncontradoException {
+    public ApiResponse<List<PagamentoResponseDto>> obterPagamentoPorCliente(Long idCliente, String path) throws NotFoundException {
         if (!clienteRepository.existsById(idCliente)) {
-            throw new RecursoNaoEncontradoException("Cliente não encontrado.");
+            throw new NotFoundException("Cliente não encontrado.");
         }
         List<Pagamento> pagamentos = pagamentoRepository.findAllByClienteId(idCliente);
 
         if (pagamentos.isEmpty()) {
-            throw new RecursoNaoEncontradoException("Nenhum pagamento encontrado para este cliente .");
+            throw new NotFoundException("Nenhum pagamento encontrado para este cliente .");
         }
         var pagamentoResponseList=pagamentos.stream().map(pagamento -> {
 
@@ -101,15 +101,15 @@ public class PagamentoService {
         return ResponseUtil.sucess(pagamentoResponseList, "Sucesso", path);
     }
 
-    public ApiResponse<PagamentoResponseDto> obterPagamentoPorPedido(Long idPedido, String path) throws RecursoNaoEncontradoException {
+    public ApiResponse<PagamentoResponseDto> obterPagamentoPorPedido(Long idPedido, String path) throws NotFoundException {
         var pedido = pedidoRepository.findById(idPedido);
         if (pedido.isEmpty()) {
-            throw new RecursoNaoEncontradoException("Pedido não inválido.");
+            throw new NotFoundException("Pedido não inválido.");
         }
         Optional<Pagamento> pagamento = pagamentoRepository.findByPedido(pedido.get());
 
         if (pagamento.isEmpty()) {
-            throw new RecursoNaoEncontradoException("Nenhum pagamento encontrado para este pedido .");
+            throw new NotFoundException("Nenhum pagamento encontrado para este pedido .");
         }
         String nomeCliente=this.obterClienteQuePagou(pagamento.get());
         return ResponseUtil.sucess(new PagamentoResponseDto(pagamento.get(),nomeCliente), "Sucesso", path);

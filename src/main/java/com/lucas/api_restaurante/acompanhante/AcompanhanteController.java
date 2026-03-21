@@ -1,8 +1,7 @@
 package com.lucas.api_restaurante.acompanhante;
 
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -28,7 +27,7 @@ public class AcompanhanteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Acompanhante>> buscarAcompanhantePorId(@PathVariable Long id) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<Acompanhante>> buscarAcompanhantePorId(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(acompanhanteService.buscarAcompanhantePorId(id,"/acompanhantes/"));
     }
     @PostMapping
@@ -37,12 +36,12 @@ public class AcompanhanteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Acompanhante>> editarAcompanhante(@PathVariable Long id, @RequestBody Acompanhante acompanhante) throws RecursoNaoEncontradoException{
+    public ResponseEntity<ApiResponse<Acompanhante>> editarAcompanhante(@PathVariable Long id, @RequestBody Acompanhante acompanhante) throws NotFoundException {
         return ResponseEntity.ok(acompanhanteService.editarAcompanhante(id,acompanhante,"/acompanhantes/"));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<ApiResponse<Void>> excluirAcompanhante(@PathVariable Long id) throws RecursoNaoEncontradoException{
+    public ResponseEntity<ApiResponse<Void>> excluirAcompanhante(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok(acompanhanteService.deletarAcompanhante(id,"/acompanhantes/"));
     }
 }

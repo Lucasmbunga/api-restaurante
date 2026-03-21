@@ -1,11 +1,10 @@
 package com.lucas.api_restaurante.categoria;
 
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
 
@@ -32,9 +31,9 @@ public class CategoriaService {
         return ResponseUtil.sucess(categoriaRepository.findAll(pageable).getContent(), "Sucesso", path);
     }
 
-    public ApiResponse<Categoria> buscarCategoriaPorId(Long id, String path) throws RecursoNaoEncontradoException {
+    public ApiResponse<Categoria> buscarCategoriaPorId(Long id, String path) throws NotFoundException {
         if (!categoriaEncontrada(id)) {
-            throw new RecursoNaoEncontradoException("Não foi encontrada um categoria com id" + id);
+            throw new NotFoundException("Não foi encontrada um categoria com id" + id);
         }
 
         Categoria categoria = categoriaRepository.findById(id).get();
@@ -45,10 +44,10 @@ public class CategoriaService {
         return categoriaRepository.existsById(id);
     }
 
-    public ApiResponse<Categoria> atualizarCategoria(Long id, CategoriaRequestDto categoriaRequestDto, String path) throws RecursoNaoEncontradoException {
+    public ApiResponse<Categoria> atualizarCategoria(Long id, CategoriaRequestDto categoriaRequestDto, String path) throws NotFoundException {
         var categoriaProcurada = categoriaRepository.findById(id);
         if (!categoriaProcurada.isPresent()) {
-            throw new RecursoNaoEncontradoException("Não foi encontrada uma categoria com id" + id);
+            throw new NotFoundException("Não foi encontrada uma categoria com id" + id);
         }
         Categoria categoriaEncontrada = categoriaProcurada.get();
         categoriaEncontrada.setNome(

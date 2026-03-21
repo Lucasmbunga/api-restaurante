@@ -3,7 +3,7 @@ package com.lucas.api_restaurante.saidacaixa;
 import com.lucas.api_restaurante.caixa.CaixaRepository;
 import com.lucas.api_restaurante.contasapagar.ContasAPagarRepository;
 import com.lucas.api_restaurante.contasapagar.EstadoPagamento;
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
 import com.lucas.api_restaurante.turno.StatusTurno;
@@ -34,22 +34,22 @@ public class SaidaCaixaService {
         return ResponseUtil.sucess(saidasCaixas, "Sucesso", path);
     }
 
-    public ApiResponse<List<SaidaCaixa>> obterSaidasDiaria(String path) throws RecursoNaoEncontradoException {
+    public ApiResponse<List<SaidaCaixa>> obterSaidasDiaria(String path) throws NotFoundException {
         var turnoAtivo = this.obterTurnoAtivo();
         List<SaidaCaixa> saidasCaixas = saidaCaixaRepository.findByTurno(turnoAtivo);
         return ResponseUtil.sucess(saidasCaixas, "Sucesso", path + turnoAtivo.getId() + "/saidas");
     }
 
-    public ApiResponse<List<SaidaCaixa>> obterSaidasPorTurno(Long idTurno, String path) throws RecursoNaoEncontradoException {
-        var turno = turnoRepository.findById(idTurno).orElseThrow(() -> new RecursoNaoEncontradoException("Não foi encontrado um turno com id " + idTurno));
+    public ApiResponse<List<SaidaCaixa>> obterSaidasPorTurno(Long idTurno, String path) throws NotFoundException {
+        var turno = turnoRepository.findById(idTurno).orElseThrow(() -> new NotFoundException("Não foi encontrado um turno com id " + idTurno));
         List<SaidaCaixa> saidasCaixas = saidaCaixaRepository.findByTurno(turno);
         return ResponseUtil.sucess(saidasCaixas, "Sucesso", path);
     }
 
     @Transactional
-    public ApiResponse<SaidaCaixa> darSaidaCaixa(SaidaCaixaRequestDto saidaCixaRequest) throws RecursoNaoEncontradoException {
+    public ApiResponse<SaidaCaixa> darSaidaCaixa(SaidaCaixaRequestDto saidaCixaRequest) throws NotFoundException {
         var turnoAtivo = this.obterTurnoAtivo();
-        var caixa = caixaRepository.findByTurno(turnoAtivo).orElseThrow(() -> new RecursoNaoEncontradoException("Caixa não encontrada para o turno especificado"));
+        var caixa = caixaRepository.findByTurno(turnoAtivo).orElseThrow(() -> new NotFoundException("Caixa não encontrada para o turno especificado"));
 
         if (saidaCixaRequest.valor().compareTo(BigDecimal.ZERO) <= 0) {
 
@@ -70,7 +70,7 @@ public class SaidaCaixaService {
         novaSaida.setDescricao(saidaCixaRequest.descricao() + ". Autor: " + ((Usuario) auth.getPrincipal()).getNome());
 
         if (saidaCixaRequest.idContaAPagar() != null) {
-            var contaAPagar = contasRepository.findById(saidaCixaRequest.idContaAPagar()).orElseThrow(() -> new RecursoNaoEncontradoException("Não foi encontrada uma conta a pagar com id" + saidaCixaRequest.idContaAPagar()));
+            var contaAPagar = contasRepository.findById(saidaCixaRequest.idContaAPagar()).orElseThrow(() -> new NotFoundException("Não foi encontrada uma conta a pagar com id" + saidaCixaRequest.idContaAPagar()));
             novaSaida.setContasAPagar(contaAPagar);
 
             if (saidaCixaRequest.valor().equals(contaAPagar.getValorAPagar())) {
@@ -89,8 +89,8 @@ public class SaidaCaixaService {
         return ResponseUtil.sucess(saidaRegistrada, "Sucesso", "");
     }
 
-    public Turno obterTurnoAtivo() throws RecursoNaoEncontradoException {
-        return turnoRepository.findByStatus(StatusTurno.ABERTO).orElseThrow(() -> new RecursoNaoEncontradoException("Nenhum turno está aberto."));
+    public Turno obterTurnoAtivo() throws NotFoundException {
+        return turnoRepository.findByStatus(StatusTurno.ABERTO).orElseThrow(() -> new NotFoundException("Nenhum turno está aberto."));
     }
 
 }

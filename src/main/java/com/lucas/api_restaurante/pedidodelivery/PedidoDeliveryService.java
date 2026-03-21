@@ -3,16 +3,12 @@ package com.lucas.api_restaurante.pedidodelivery;
 import com.lucas.api_restaurante.acompanhante.Acompanhante;
 import com.lucas.api_restaurante.acompanhante.AcompanhanteRepository;
 import com.lucas.api_restaurante.cliente.ClienteRepository;
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.garcom.GarcomRepository;
 import com.lucas.api_restaurante.itemacompanhante.ItemAcompanhante;
 import com.lucas.api_restaurante.itemacompanhante.ItemAcompanhanteRepository;
 import com.lucas.api_restaurante.itempedido.*;
 import com.lucas.api_restaurante.pedido.EstadoPedido;
-import com.lucas.api_restaurante.pedidomesa.PedidoMesa;
-import com.lucas.api_restaurante.pedidosalao.PedidoSalao;
-import com.lucas.api_restaurante.pedidosalao.PedidoSalaoRequestDto;
-import com.lucas.api_restaurante.pedidosalao.PedidoSalaoResponseDto;
 import com.lucas.api_restaurante.produto.Produto;
 import com.lucas.api_restaurante.produto.ProdutoRepository;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
@@ -31,7 +27,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -68,7 +63,7 @@ public class PedidoDeliveryService {
     }
 
     @Transactional
-    public ApiResponse<PedidoDeliveryResponseDto> criarPedido(PedidoDeliveryRequestDto pedidoRequest, String path) throws RecursoNaoEncontradoException{
+    public ApiResponse<PedidoDeliveryResponseDto> criarPedido(PedidoDeliveryRequestDto pedidoRequest, String path) throws NotFoundException {
         var turnoAtivo = turnoService.obterTurnoAtivo().data();
 
         if (turnoAtivo.isEmpty()) {
@@ -117,7 +112,7 @@ public class PedidoDeliveryService {
 
 
         for (ItemPedidoRequestDto itemRequest : pedidoRequest.itensDoPedido()) {
-            var produto = produtoRepository.findById(itemRequest.idProduto()).orElseThrow(() -> new RecursoNaoEncontradoException("Não foi encontrado um pedido com id" + itemRequest.idProduto()));
+            var produto = produtoRepository.findById(itemRequest.idProduto()).orElseThrow(() -> new NotFoundException("Não foi encontrado um pedido com id" + itemRequest.idProduto()));
             var itemPedido = itemPedidoRepository.findByProdutoAndPedido(produto,pedidoCriado);
 
             if(produto.getCategoria().getNome().equalsIgnoreCase("Pratos a Peixe") && itemRequest.idsAcompanhantes().isEmpty()){
@@ -128,7 +123,7 @@ public class PedidoDeliveryService {
 
                 for (Long idAcompanhante : itemRequest.idsAcompanhantes()) {
 
-                    Acompanhante acompanhante = acompanhanteRepository.findById(idAcompanhante).orElseThrow(() -> new RecursoNaoEncontradoException("Não foi encontrado um acompanhante com id " + idAcompanhante));
+                    Acompanhante acompanhante = acompanhanteRepository.findById(idAcompanhante).orElseThrow(() -> new NotFoundException("Não foi encontrado um acompanhante com id " + idAcompanhante));
                     var novoItemAcompanhante = new ItemAcompanhante();
                     novoItemAcompanhante.setItemPedido(itemPedido);
                     novoItemAcompanhante.setAcompanhante(acompanhante);

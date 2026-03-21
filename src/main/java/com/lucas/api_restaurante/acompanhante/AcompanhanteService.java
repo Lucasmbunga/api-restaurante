@@ -1,6 +1,6 @@
 package com.lucas.api_restaurante.acompanhante;
 
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +21,9 @@ public class AcompanhanteService {
         return ResponseUtil.sucess(acompanhanteRepository.findAll(pageable).getContent(),"Sucesso",path);
     }
 
-    public ApiResponse<Acompanhante> buscarAcompanhantePorId(Long id,String path) throws RecursoNaoEncontradoException{
+    public ApiResponse<Acompanhante> buscarAcompanhantePorId(Long id,String path) throws NotFoundException {
         if(!acompanhanteRepository.findById(id).isPresent()){
-            throw new RecursoNaoEncontradoException("Não foi encontrado um acompanhante com id "+id);
+            throw new NotFoundException("Não foi encontrado um acompanhante com id "+id);
         }
 
         return ResponseUtil.sucess(acompanhanteRepository.findById(id).get(),"Sucesso",path+id);
@@ -39,9 +39,9 @@ public class AcompanhanteService {
         return ResponseUtil.sucess(acompanhanteCadastrado,"Sucesso",path+acompanhanteCadastrado.getId());
     }
 
-    public ApiResponse<Acompanhante> editarAcompanhante(Long id,Acompanhante acompanhante,String path) throws RecursoNaoEncontradoException{
+    public ApiResponse<Acompanhante> editarAcompanhante(Long id,Acompanhante acompanhante,String path) throws NotFoundException {
         if(!acompanhanteRepository.findById(id).isPresent()){
-            throw new RecursoNaoEncontradoException("Não foi encontrado um acompanhante com id"+id);
+            throw new NotFoundException("Não foi encontrado um acompanhante com id"+id);
         }
         var acompanhanteExistente=acompanhanteRepository.findById(id).get();
         acompanhanteExistente.setNome(!(acompanhante.getNome().isBlank())?acompanhante.getNome():acompanhanteExistente.getNome());
@@ -53,9 +53,9 @@ public class AcompanhanteService {
         return ResponseUtil.sucess(acompanhanteEditado,"Sucesso",path+id);
     }
 
-    public ApiResponse<Void> deletarAcompanhante(Long id,String path) throws RecursoNaoEncontradoException{
+    public ApiResponse<Void> deletarAcompanhante(Long id,String path) throws NotFoundException {
         if(!acompanhanteRepository.findById(id).isPresent()){
-            throw new RecursoNaoEncontradoException("Não foi encontrado um acompanhante com id"+id);
+            throw new NotFoundException("Não foi encontrado um acompanhante com id"+id);
         }
 
         acompanhanteRepository.deleteById(id);

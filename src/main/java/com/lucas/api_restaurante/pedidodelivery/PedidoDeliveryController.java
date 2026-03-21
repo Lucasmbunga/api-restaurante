@@ -1,6 +1,6 @@
 package com.lucas.api_restaurante.pedidodelivery;
 
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.itempedido.ItemPedido;
 import com.lucas.api_restaurante.itempedido.ItemPedidoDeleteRequestDto;
 import com.lucas.api_restaurante.itempedido.ItemPedidoRequestDto;
@@ -37,7 +37,7 @@ public class PedidoDeliveryController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<ApiResponse<PedidoDeliveryResponseDto>> criarPedido(@RequestBody PedidoDeliveryRequestDto pedidoRequest) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<PedidoDeliveryResponseDto>> criarPedido(@RequestBody PedidoDeliveryRequestDto pedidoRequest) throws NotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDeliveryService.criarPedido(pedidoRequest, "/delivery_pedidos/"));
     }
 

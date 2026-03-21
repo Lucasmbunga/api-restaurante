@@ -1,8 +1,7 @@
 package com.lucas.api_restaurante.pagamento;
 
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -22,7 +21,7 @@ public class PagamentoController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<PagamentoResponseDto>> fazerPagamento(@RequestBody PagamentoRequestDto pagamentoRequest)throws RecursoNaoEncontradoException{
+    public ResponseEntity<ApiResponse<PagamentoResponseDto>> fazerPagamento(@RequestBody PagamentoRequestDto pagamentoRequest)throws NotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(pagamentoService.registrarPagamento(pagamentoRequest,"/pagamentos/"));
     }
 
@@ -31,17 +30,17 @@ public class PagamentoController {
         return ResponseEntity.ok(pagamentoService.listarPagamentos(pageable,"/pagamentos"));
     }
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PagamentoResponseDto>> obterPagamentoPorId(@PathVariable Long id)throws RecursoNaoEncontradoException{
+    public ResponseEntity<ApiResponse<PagamentoResponseDto>> obterPagamentoPorId(@PathVariable Long id)throws NotFoundException {
         return ResponseEntity.ok(pagamentoService.obterPagamentoPorId(id,""));
     }
 
     @GetMapping("/{idPedido}/pagamento")
-    public ResponseEntity<ApiResponse<PagamentoResponseDto>> obterPagamentoPorPedido(@PathVariable Long idPedido)throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<PagamentoResponseDto>> obterPagamentoPorPedido(@PathVariable Long idPedido)throws NotFoundException {
         return ResponseEntity.ok(pagamentoService.obterPagamentoPorPedido(idPedido,""));
     }
 
     @GetMapping("{idCliente}/pagamentos")
-    public ResponseEntity<ApiResponse<List<PagamentoResponseDto>>> obterPagamentoPorCliente(@PathVariable Long idCliente) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<List<PagamentoResponseDto>>> obterPagamentoPorCliente(@PathVariable Long idCliente) throws NotFoundException {
         return ResponseEntity.ok(pagamentoService.obterPagamentoPorCliente(idCliente,""));
     }
 

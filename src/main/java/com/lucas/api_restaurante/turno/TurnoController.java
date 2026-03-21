@@ -1,7 +1,7 @@
 package com.lucas.api_restaurante.turno;
 
 import com.lucas.api_restaurante.caixa.CaixaAberturaRequestDto;
-import com.lucas.api_restaurante.exceptions.RecursoNaoEncontradoException;
+import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +10,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -28,13 +27,13 @@ public class TurnoController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<ApiResponse<TurnoResponseDto>> abrirTurno(@RequestBody CaixaAberturaRequestDto caixaRequest) throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<TurnoResponseDto>> abrirTurno(@RequestBody CaixaAberturaRequestDto caixaRequest) throws NotFoundException {
         return ResponseEntity.ok(turnoService.abrirTurno(caixaRequest.valorInicial()));
     }
 
     @PostMapping("/fecho")
     @Transactional
-    public ResponseEntity<ApiResponse<FechoTurnoResponseDto>> fecharTurno() throws RecursoNaoEncontradoException {
+    public ResponseEntity<ApiResponse<FechoTurnoResponseDto>> fecharTurno() throws NotFoundException {
         return ResponseEntity.ok(turnoService.fecharTurno());
     }
 
