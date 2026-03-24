@@ -2,21 +2,29 @@ package com.lucas.api_restaurante.produto;
 
 import com.lucas.api_restaurante.categoria.CategoriaRepository;
 import com.lucas.api_restaurante.exceptions.NotFoundException;
+import com.lucas.api_restaurante.produto_stock.ProdutoStock;
+import com.lucas.api_restaurante.produto_stock.ProdutoStockRepository;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
 public class ProdutoService {
     private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final ProdutoStockRepository produtoStockRepository;
 
-    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository) {
+    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository,ProdutoStockRepository produtoStockRepository) {
         this.produtoRepository = produtoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.produtoStockRepository = produtoStockRepository;
     }
 
     public ApiResponse<ProdutoResponseDto> cadastrarProduto(ProdutoRequestDto produtoRequestDto, String path) throws NotFoundException {
@@ -30,11 +38,24 @@ public class ProdutoService {
         novoProduto.setCategoria(categoria);
 
         var produtoSalvo = produtoRepository.save(novoProduto);
+
+        ProdutoStock novoProdutoStock = new ProdutoStock();
+        novoProdutoStock.setProduto(produtoSalvo);
+        produtoStockRepository.save(novoProdutoStock);
+
+
         ProdutoResponseDto produtoResponseDto = new ProdutoResponseDto(produtoSalvo.getId(),produtoSalvo.getNome(), produtoSalvo.getPrecoCompra(), produtoSalvo.getPrecoVenda(), produtoSalvo.getTipoProduto());
         return ResponseUtil.sucess(produtoResponseDto, "Produto cadastrado com sucesso", path);
 
     }
 
+    public ApiResponse<String> carregarImagem(MultipartFile arquivo) throws NotFoundException {
+        String caminho="uploads/";
+        String nomeArquivo=arquivo.getOriginalFilename();
+        Path pasta= Paths.get(caminho+nomeArquivo);
+
+        return ResponseUtil.sucess(nomeArquivo,"Sucesso",null);
+    }
     public ApiResponse<List<ProdutoResponseDto>> listarProdutos(Pageable pageable, String path) {
         List<ProdutoResponseDto> produtos = produtoRepository.findAll(pageable)
                 .map(produto ->
@@ -56,12 +77,12 @@ public class ProdutoService {
         produtoExistente.setNome(!produtoRequestDto.nome().isBlank() ? produtoRequestDto.nome() : produtoExistente.getNome());
 
         produtoExistente.setPrecoCompra(
-                !produtoRequestDto.precoCompra().equals(null) ? produtoRequestDto.precoCompra() : produtoExistente.getPrecoCompra());
+                produtoRequestDto.precoCompra() != null ? produtoRequestDto.precoCompra() : produtoExistente.getPrecoCompra());
 
-        produtoExistente.setPrecoVenda(!produtoRequestDto.precoVenda().equals(null) ?
+        produtoExistente.setPrecoVenda(produtoRequestDto.precoVenda() != null ?
                 produtoRequestDto.precoVenda() : produtoExistente.getPrecoVenda());
 
-        produtoExistente.setTipoProduto(!produtoRequestDto.tipoProduto().equals(null) ?
+        produtoExistente.setTipoProduto(produtoRequestDto.tipoProduto() != null ?
                 produtoRequestDto.tipoProduto() : produtoExistente.getTipoProduto());
         produtoExistente.setCategoria(categoria);
 

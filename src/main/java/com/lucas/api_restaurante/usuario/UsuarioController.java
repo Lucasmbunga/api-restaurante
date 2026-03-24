@@ -32,7 +32,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Usuario>> cadastrar(@Valid @RequestBody UsuarioCreateDto usuario){
+    public ResponseEntity<ApiResponse<Usuario>> cadastrar(@Valid @RequestBody UsuarioRegisterDto usuario){
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.registrarUsuario(usuario,"/usuarios"));
 
     }

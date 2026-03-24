@@ -1,6 +1,6 @@
 package com.lucas.api_restaurante.mesa;
 
-import com.lucas.api_restaurante.pedidosalao.PedidoSalao;
+import com.lucas.api_restaurante.pedido_salao.PedidoSalao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;

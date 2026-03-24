@@ -32,7 +32,7 @@ public class UsuarioService {
 
     }
 
-    public ApiResponse<Usuario> registrarUsuario(UsuarioCreateDto usuario, String path) {
+    public ApiResponse<Usuario> registrarUsuario(UsuarioRegisterDto usuario, String path) {
         var novoUsuario=new Usuario();
         novoUsuario.setEmail(usuario.email());
         String senhaEncriptada=new BCryptPasswordEncoder().encode(usuario.senha());

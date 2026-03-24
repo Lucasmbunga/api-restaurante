@@ -2,7 +2,7 @@ package com.lucas.api_restaurante.pagamento;
 
 import com.lucas.api_restaurante.caixa.CaixaRepository;
 import com.lucas.api_restaurante.cliente.ClienteRepository;
-import com.lucas.api_restaurante.entradacaixa.EntradaCaixaService;
+import com.lucas.api_restaurante.entrada_caixa.EntradaCaixaService;
 import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.pedido.EstadoPedido;
 import com.lucas.api_restaurante.pedido.PedidoRepository;

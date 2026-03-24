@@ -3,7 +3,7 @@ package com.lucas.api_restaurante.pedido;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lucas.api_restaurante.cliente.Cliente;
 import com.lucas.api_restaurante.garcom.Garcom;
-import com.lucas.api_restaurante.itempedido.ItemPedido;
+import com.lucas.api_restaurante.item_pedido.ItemPedido;
 import com.lucas.api_restaurante.turno.Turno;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

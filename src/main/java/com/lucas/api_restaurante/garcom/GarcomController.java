@@ -22,7 +22,7 @@ public class GarcomController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<GarcomResponseDto>> registrarGarcom(@RequestBody @Valid GarcomCreateDto dto) {
+    public ResponseEntity<ApiResponse<GarcomResponseDto>> registrarGarcom(@RequestBody @Valid GarcomRegisterDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(garcomService.registrarGarcom(dto,"/api/garcons/"));
     }
     @GetMapping
@@ -36,7 +36,7 @@ public class GarcomController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<GarcomResponseDto>> editarGarcom(@PathVariable Long id, @RequestBody @Valid GarcomCreateDto dto) {
+    public ResponseEntity<ApiResponse<GarcomResponseDto>> editarGarcom(@PathVariable Long id, @RequestBody @Valid GarcomRegisterDto dto) {
         return ResponseEntity.ok(garcomService.editarDadosDoGarcom(id,dto,"/garcons/"+id));
     }
 

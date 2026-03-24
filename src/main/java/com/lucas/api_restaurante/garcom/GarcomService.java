@@ -34,21 +34,21 @@ public class GarcomService {
         );
     }
 
-    public ApiResponse<GarcomResponseDto> registrarGarcom(GarcomCreateDto garcomCreateDto, String path) {
-        if (!(usuarioService.buscarUsuarioPorEmail(garcomCreateDto.email()) == null)) {
-            throw new RuntimeException("Já existe um usuário cadastrado com email " + garcomCreateDto.email());
+    public ApiResponse<GarcomResponseDto> registrarGarcom(GarcomRegisterDto garcomRegisterDto, String path) {
+        if (!(usuarioService.buscarUsuarioPorEmail(garcomRegisterDto.email()) == null)) {
+            throw new RuntimeException("Já existe um usuário cadastrado com email " + garcomRegisterDto.email());
         }
         Garcom novoGarcom = new Garcom();
-        novoGarcom.setNome(garcomCreateDto.nome());
-        novoGarcom.setEmail(garcomCreateDto.email());
+        novoGarcom.setNome(garcomRegisterDto.nome());
+        novoGarcom.setEmail(garcomRegisterDto.email());
 
-        String senhaEncriptada = new BCryptPasswordEncoder().encode(garcomCreateDto.senha());
+        String senhaEncriptada = new BCryptPasswordEncoder().encode(garcomRegisterDto.senha());
         novoGarcom.setSenha(senhaEncriptada);
 
-        List<Telefone> telefones = garcomCreateDto.telefones().stream().map(fone -> new Telefone(fone, novoGarcom)).collect(Collectors.toList());
+        List<Telefone> telefones = garcomRegisterDto.telefones().stream().map(fone -> new Telefone(fone, novoGarcom)).collect(Collectors.toList());
         novoGarcom.setTelefones(telefones);
         novoGarcom.setTipoUsuario(TipoUsuario.GARCOM);
-        novoGarcom.setCargo(garcomCreateDto.cargo());
+        novoGarcom.setCargo(garcomRegisterDto.cargo());
         var garcomRegistrado = garcomRepository.save(novoGarcom);
         return ResponseUtil.sucess(this.entityToDto(garcomRegistrado), "Garçom registrado com sucesso", path);
 
@@ -68,21 +68,21 @@ public class GarcomService {
         return ResponseUtil.sucess(this.entityToDto(garcomRepository.findById(id).get()), "Sucesso", path);
     }
 
-    public ApiResponse<GarcomResponseDto> editarDadosDoGarcom(Long id, GarcomCreateDto garcomCreateDto, String path) {
+    public ApiResponse<GarcomResponseDto> editarDadosDoGarcom(Long id, GarcomRegisterDto garcomRegisterDto, String path) {
 
         if (garcomRepository.findById(id).isEmpty()) {
             throw new RuntimeException("Falha ao editar o garcom. Porque não foi encontrado um garçom com id " + id);
         }
 
         var garcomEncontrado = garcomRepository.findById(id).get();
-        garcomEncontrado.setNome(garcomCreateDto.nome());
-        garcomEncontrado.setEmail(garcomCreateDto.email());
-        garcomEncontrado.setSenha(garcomCreateDto.senha());
+        garcomEncontrado.setNome(garcomRegisterDto.nome());
+        garcomEncontrado.setEmail(garcomRegisterDto.email());
+        garcomEncontrado.setSenha(garcomRegisterDto.senha());
 
-        List<Telefone> telefones = garcomCreateDto.telefones().stream().map(fone -> new Telefone(fone, garcomEncontrado)).collect(Collectors.toList());
+        List<Telefone> telefones = garcomRegisterDto.telefones().stream().map(fone -> new Telefone(fone, garcomEncontrado)).collect(Collectors.toList());
         garcomEncontrado.setTelefones(telefones.isEmpty() ? garcomEncontrado.getTelefones() : telefones);
         garcomEncontrado.setTipoUsuario(TipoUsuario.GARCOM);
-        garcomEncontrado.setCargo(garcomCreateDto.cargo());
+        garcomEncontrado.setCargo(garcomRegisterDto.cargo());
         var garcomEditado = garcomRepository.save(garcomEncontrado);
 
         return ResponseUtil.sucess(this.entityToDto(garcomEditado), "Sucesso", path);

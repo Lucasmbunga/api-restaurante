@@ -50,4 +50,5 @@ public class ProdutoController {
         this.produtoService.verificarProdutoPorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(produtoService.excluirProduto(id,"/produtos/"+id));
     }
+
 }

@@ -6,7 +6,7 @@ import com.lucas.api_restaurante.caixa.CaixaRepository;
 import com.lucas.api_restaurante.exceptions.NotFoundException;
 import com.lucas.api_restaurante.responseutils.ApiResponse;
 import com.lucas.api_restaurante.responseutils.ResponseUtil;
-import com.lucas.api_restaurante.saidacaixa.SaidaCaixa;
+import com.lucas.api_restaurante.saida_caixa.SaidaCaixa;
 import com.lucas.api_restaurante.usuario.Usuario;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;

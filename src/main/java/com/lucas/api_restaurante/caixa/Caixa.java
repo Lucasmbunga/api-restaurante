@@ -1,8 +1,8 @@
 package com.lucas.api_restaurante.caixa;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lucas.api_restaurante.entradacaixa.EntradaCaixa;
-import com.lucas.api_restaurante.saidacaixa.SaidaCaixa;
+import com.lucas.api_restaurante.entrada_caixa.EntradaCaixa;
+import com.lucas.api_restaurante.saida_caixa.SaidaCaixa;
 import com.lucas.api_restaurante.turno.Turno;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
