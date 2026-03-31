@@ -40,7 +40,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE,"/produtos/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/garcons/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/garcons/{id}").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .logout(logout->logout.addLogoutHandler(clearSiteData))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lucas.api_restaurante.categoria.Categoria;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -35,4 +32,13 @@ public class Produto {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_categoria",nullable = false)
     private Categoria categoria;
+
+    @Override
+    public String toString(){
+        return "Produto{"+
+                "id="+id+
+                "nome:"+nome+
+                " precoCompra: "+precoCompra+
+                " precoVenda: "+precoVenda+"}";
+    }
 }

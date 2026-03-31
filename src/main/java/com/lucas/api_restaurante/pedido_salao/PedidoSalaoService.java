@@ -198,7 +198,7 @@ public class PedidoSalaoService {
     }
 
     private PedidoSalaoResponseDto responseDto(PedidoSalao pedido) throws NotFoundException {
-        var mesa = mesaRepository.findByPedido(pedido.getId()).orElseThrow(() -> new NotFoundException("Mesa não encontrada."));
+        var mesa = mesaRepository.findByPedido(pedido.getId()).orElseThrow(() -> new NotFoundException("Mesa não encontrada para    o pedido  "+pedido.toString()));
 
         var itens = pedido.getItens().stream()
                 .map(item -> {

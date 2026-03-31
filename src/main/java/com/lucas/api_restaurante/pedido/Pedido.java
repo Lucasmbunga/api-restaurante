@@ -7,10 +7,7 @@ import com.lucas.api_restaurante.item_pedido.ItemPedido;
 import com.lucas.api_restaurante.turno.Turno;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,6 +19,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Pedido {
     @Id
